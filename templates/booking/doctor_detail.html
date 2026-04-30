@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width:800px; margin:40px auto; padding:0 20px;">
+    <h2>Dr. {{ doctor.name }}</h2>
+    <p style="color:#666;">{{ doctor.department.name }}</p>
+    {% if doctor.bio %}<p>{{ doctor.bio }}</p>{% endif %}
+
+    <h3 style="margin-top:32px;">Sana tanlang</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+        {% for d in dates_list %}
+        <a href="?date={{ d|date:'Y-m-d' }}" style="padding:8px 16px; border-radius:8px; border:1px solid {% if d == selected_date %}#1D9E75{% else %}#ddd{% endif %}; background:{% if d == selected_date %}#1D9E75{% else %}#fff{% endif %}; color:{% if d == selected_date %}#fff{% else %}#333{% endif %}; text-decoration:none;">
+            {{ d|date:'d-M' }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <h3 style="margin-top:32px;">Vaqt tanlang</h3>
+    {% if available_slots %}
+    <form method="post" action="/book/{{ doctor.id }}/">
+        {% csrf_token %}
+        <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+            {% for slot in available_slots %}
+            <label style="cursor:pointer;">
+                <input type="radio" name="time_slot" value="{{ slot|time:'H:i' }}" required style="display:none;">
+                <span style="display:inline-block; padding:8px 16px; border-radius:8px; border:1px solid #ddd; background:#fff;">
+                    {{ slot|time:'H:i' }}
+                </span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top:24px;">
+            <input type="text" name="patient_name" placeholder="Ismingiz" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:12px;">
+            <input type="text" name="phone_number" placeholder="Telefon raqamingiz" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:12px;">
+            <textarea name="symptoms" placeholder="Shikoyatlaringiz (ixtiyoriy)" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:12px; height:100px;"></textarea>
+            <button type="submit" style="padding:12px 30px; background:#1D9E75; color:#fff; border:none; border-radius:8px; font-size:16px; cursor:pointer;">Qabulga yozilish</button>
+        </div>
+    </form>
+    {% else %}
+    <p style="color:#e74c3c;">Bu kunda bo'sh vaqt yo'q. Boshqa kun tanlang.</p>
+    {% endif %}
+</div>
+{% endblock %}
