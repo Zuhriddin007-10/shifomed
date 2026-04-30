@@ -16,10 +16,9 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'department', 'work_start', 'work_end', 'slot_duration', 'appointment_count')
+    list_display = ('name', 'department', 'work_start', 'work_end', 'slot_duration')
     list_filter = ('department',)
     search_fields = ('name', 'bio')
-    readonly_fields = ('appointment_count',)
 
     fieldsets = (
         ("Asosiy ma'lumotlar", {
@@ -30,34 +29,15 @@ class DoctorAdmin(admin.ModelAdmin):
         }),
     )
 
-    def appointment_count(self, obj):
-        count = obj.appointments.count()
-        return format_html('<b style="color:#1D9E75">{}</b> ta navbat', count)
-    appointment_count.short_description = "Navbatlar soni"
-
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ('patient_name', 'phone_number', 'doctor', 'date', 'time_slot', 'colored_status', 'created_at')
-    list_filter = ('status', 'date', 'doctor', 'doctor__department')
+    list_filter = ('status', 'date', 'doctor')
     search_fields = ('patient_name', 'phone_number', 'doctor__name')
     readonly_fields = ('created_at',)
-    list_editable = ('status',)
     date_hierarchy = 'date'
     ordering = ('-date', 'time_slot')
-
-    fieldsets = (
-        ("Bemor ma'lumotlari", {
-            'fields': ('patient_name', 'phone_number', 'symptoms')
-        }),
-        ('Navbat ma\'lumotlari', {
-            'fields': ('doctor', 'date', 'time_slot', 'status')
-        }),
-        ('Qo\'shimcha', {
-            'fields': ('created_at',),
-            'classes': ('collapse',)
-        }),
-    )
 
     def colored_status(self, obj):
         colors = {
